@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LunchMoney Transaction Generator</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🍽️ LunchMoney Transaction Generator</h1>
+            <p>Generate realistic recurring transactions for testing and demo purposes</p>
+            <p><small>Perfect for demonstrating cash flow apps like <a href="https://projectedcashflow.app" target="_blank">projectedcashflow.app</a></small></p>
+        </header>
+
+        <main>
+            <div class="card">
+                <h2>⚠️ Important Notice</h2>
+                <div class="warning">
+                    <p><strong>This tool is designed for testing and demo accounts only.</strong></p>
+                    <p>It will create sample transactions in your LunchMoney account. Please ensure you're using a test account or are comfortable with adding sample data.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🚀 Quick Setup for New Accounts</h2>
+                <p>For the best experience, we recommend starting with a fresh LunchMoney budget:</p>
+                <div class="setup-instructions">
+                    <div class="setup-step">
+                        <h4>📖 Follow the Official Guide</h4>
+                        <p>See <strong>Step 1: Getting Started</strong> of <a href="https://support.lunchmoney.app/getting-started" target="_blank">this link</a> and choose <strong>"Skip the walkthrough"</strong></p>
+                    </div>
+                    <div class="setup-step">
+                        <h4>🎯 Why "Skip the walkthrough"?</h4>
+                        <p>This option will skip all the basic setup steps, giving you a completely blank slate to work with. There will be no categories set up, and you'll be set with default date and display preferences.</p>
+                    </div>
+                    <div class="setup-step">
+                        <h4>✨ Perfect for Testing</h4>
+                        <p>This tool will automatically create sample accounts and categories as needed - perfect for testing cash flow apps and budgeting features.</p>
+                    </div>
+                    <div class="setup-step">
+                        <h4>🔄 Approve Recurring Items</h4>
+                        <p>After generating transactions, go to <strong>Recurring</strong> in LunchMoney and approve the suggested items to enable automatic recurring transaction detection.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🔑 API Configuration</h2>
+                <div class="form-group">
+                    <label for="apiKey">LunchMoney API Key:</label>
+                    <input type="password" id="apiKey" placeholder="Enter your API key here">
+                    <small>Get your API key from <a href="https://my.lunchmoney.app/developers" target="_blank">LunchMoney Developer Settings</a></small>
+                </div>
+                <button id="validateApi" class="btn btn-secondary">Validate API Key</button>
+            </div>
+
+            <div class="card" id="accountInfo" style="display: none;">
+                <h2>📊 Account Information</h2>
+                <div id="accountDetails"></div>
+            </div>
+
+            <div class="card" id="configSection" style="display: none;">
+                <h2>⚙️ Configuration</h2>
+                <div class="form-group">
+                    <label for="recurringItems">Number of Recurring Items:</label>
+                    <input type="number" id="recurringItems" value="10" min="1" max="10">
+                    <small>Choose how many recurring transactions to create (1-10)</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="months">Number of Months:</label>
+                    <input type="number" id="months" value="3" min="1" max="24">
+                    <small>How many months of transaction history to generate (going back from today)</small>
+                </div>
+                
+                <div class="form-group">
+                    <label>Account Types to Create:</label>
+                    <small>Select which types of accounts to create and set their starting balances</small>
+                    <div class="account-types">
+                        <div class="account-item">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="account-checking" value="checking" checked>
+                                <span>Checking Account</span>
+                            </label>
+                            <input type="number" class="balance-input" id="balance-checking" value="5000" step="0.01" placeholder="Balance">
+                        </div>
+                        <div class="account-item">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="account-savings" value="savings" checked>
+                                <span>Savings Account</span>
+                            </label>
+                            <input type="number" class="balance-input" id="balance-savings" value="15000" step="0.01" placeholder="Balance">
+                        </div>
+                        <div class="account-item">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="account-credit" value="credit" checked>
+                                <span>Credit Card</span>
+                            </label>
+                            <input type="number" class="balance-input" id="balance-credit" value="-850" step="0.01" placeholder="Balance">
+                        </div>
+                        <div class="account-item">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="account-investment" value="investment" checked>
+                                <span>Investment Account</span>
+                            </label>
+                            <input type="number" class="balance-input" id="balance-investment" value="25000" step="0.01" placeholder="Balance">
+                        </div>
+                        <div class="account-item">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="account-loan" value="loan">
+                                <span>Loan Account</span>
+                            </label>
+                            <input type="number" class="balance-input" id="balance-loan" value="-12000" step="0.01" placeholder="Balance">
+                        </div>
+                        <div class="account-item">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="account-cash" value="cash">
+                                <span>Cash Account</span>
+                            </label>
+                            <input type="number" class="balance-input" id="balance-cash" value="500" step="0.01" placeholder="Balance">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="preview">
+                    <div class="transaction-preview">
+                        <p><em>Configure your settings above to see a preview of what will be created.</em></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" id="actionSection" style="display: none;">
+                <h2>🚀 Generate Transactions</h2>
+                <div class="safety-check">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="confirmTest">
+                        <span class="checkmark"></span>
+                        I confirm this is a test account and I want to generate sample transactions
+                    </label>
+                </div>
+                <div class="safety-check" id="existingDataWarning" style="display: none;">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="confirmExistingData">
+                        <span class="checkmark"></span>
+                        I understand this will add sample data to my existing account and I want to proceed
+                    </label>
+                </div>
+                <button id="generateBtn" class="btn btn-primary" disabled>Generate Transactions</button>
+            </div>
+
+            <div class="card" id="progressSection" style="display: none;">
+                <h2>⏳ Progress</h2>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div id="progressText">Ready to start...</div>
+                <div id="progressLog"></div>
+            </div>
+
+            <div class="card" id="resultsSection" style="display: none;">
+                <h2>✅ Results</h2>
+                <div id="results"></div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Created with ❤️ for the LunchMoney community</p>
+            <p><a href="https://github.com/thetemplateblog/lunchmoney-transaction-generator" target="_blank">View on GitHub</a></p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
