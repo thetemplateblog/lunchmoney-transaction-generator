@@ -182,7 +182,8 @@ class TransactionGenerator {
             if (asset.name.toLowerCase().includes('savings')) existingAccountTypes.add('savings');
             if (asset.name.toLowerCase().includes('credit')) existingAccountTypes.add('credit');
             if (asset.name.toLowerCase().includes('investment')) existingAccountTypes.add('investment');
-            if (asset.name.toLowerCase().includes('loan')) existingAccountTypes.add('loan');
+            if (asset.name.toLowerCase().includes('loan') && !asset.name.toLowerCase().includes('mortgage')) existingAccountTypes.add('loan');
+            if (asset.name.toLowerCase().includes('mortgage')) existingAccountTypes.add('mortgage');
             if (asset.name.toLowerCase().includes('cash') && !asset.name.toLowerCase().includes('checking')) existingAccountTypes.add('cash');
         }
         
@@ -226,6 +227,13 @@ class TransactionGenerator {
                     subtype_name: 'cash',
                     name: 'Demo Cash Account',
                     balance: '500.00',
+                    currency: 'usd'
+                },
+                mortgage: {
+                    type_name: 'loan',
+                    subtype_name: 'mortgage',
+                    name: 'Demo Mortgage Account',
+                    balance: '-250000.00',
                     currency: 'usd'
                 }
             };
@@ -294,7 +302,8 @@ class TransactionGenerator {
             { name: "Transportation", isIncome: false },
             { name: "Savings", isIncome: false },
             { name: "Credit Card Payment", isIncome: false },
-            { name: "Loan Payment", isIncome: false }
+            { name: "Loan Payment", isIncome: false },
+            { name: "Mortgage Payment", isIncome: false }
         ];
         
         let progress = 30;
@@ -354,6 +363,16 @@ class TransactionGenerator {
                     day: 20,
                     category: "Loan Payment",
                     notes: "Monthly loan payment"
+                });
+            } else if (account.type === 'mortgage' && account.balance < 0) {
+                // Add mortgage payment (0.4% of balance for ~30 year mortgage)
+                const mortgagePayment = Math.abs(account.balance) * 0.004;
+                additionalPayments.push({
+                    payee: "Mortgage Payment",
+                    amount: -mortgagePayment,
+                    day: 1,
+                    category: "Mortgage Payment",
+                    notes: "Monthly mortgage payment"
                 });
             }
         }
@@ -723,7 +742,7 @@ class UIController {
                 previewHtml += `<li>${account.name}: ${formattedBalance}</li>`;
                 
                 // Check if we need to add automatic payments
-                if ((account.name.includes('Credit Card') || account.name.includes('Loan')) && account.balance < 0) {
+                if ((account.name.includes('Credit Card') || account.name.includes('Loan') || account.name.includes('Mortgage')) && account.balance < 0) {
                     hasLoanOrCredit = true;
                 }
             }
@@ -744,6 +763,10 @@ class UIController {
                     if (account.name.includes('Loan') && account.balance < 0) {
                         const loanPayment = Math.abs(account.balance) * 0.02;
                         previewHtml += `• Loan Payment: $${loanPayment.toFixed(2)}/month on the 20th<br>`;
+                    }
+                    if (account.name.includes('Mortgage') && account.balance < 0) {
+                        const mortgagePayment = Math.abs(account.balance) * 0.004;
+                        previewHtml += `• Mortgage Payment: $${mortgagePayment.toFixed(2)}/month on the 1st<br>`;
                     }
                 }
                 

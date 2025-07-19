@@ -82,6 +82,7 @@ All transactions will be created in the checking account.
   - Investment Account (default: $25,000)
   - Loan Account (default: -$12,000) - automatically adds monthly loan payments
   - Cash Account (default: $500)
+  - Mortgage Account (default: -$250,000) - automatically adds monthly mortgage payments
 - **Start Date**: Choose when to begin the transaction history
 - **Account Validation**: Automatic checking for empty accounts
 - **Real-time Preview**: See exactly what will be created before generating
