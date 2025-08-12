@@ -10,9 +10,22 @@ A web-based tool to generate realistic recurring transactions for LunchMoney tes
 
 - **🌐 Web-based**: Runs directly in your browser via GitHub Pages
 - **🔒 Secure**: API key stays in your browser - never sent to our servers
-- **📊 Realistic Data**: Generates common recurring transactions (salary, rent, utilities, etc.)
+- **📊 Realistic Data**: Generates common recurring transactions with accurate calculations
+- **🌍 Multi-Currency Support**: Full support for 40+ currencies matching Projected Cash Flow
+- **🏠 Mortgage/Loan Calculations**: 
+  - Proper amortization with month-by-month principal & interest breakdown
+  - Tracks decreasing balance for accurate interest calculations
+  - Supports multiple currencies with proper formatting
+- **💳 Credit Card Logic**: 
+  - Daily compounding (APR/365) for realistic interest charges
+  - Minimum payment calculation: 3% of balance + interest
+  - Multi-currency support for international cards
 - **🎯 Smart Validation**: Checks if your account is empty before generating data
 - **🔄 Recurring Detection**: LunchMoney automatically detects patterns in generated transactions
+- **🌏 International Patterns**: 
+  - Currency-specific transaction patterns (salaries, rent, utilities)
+  - Automatic currency routing to correct accounts
+  - Proper formatting (e.g., no decimals for JPY)
 - **📱 Responsive**: Works on desktop and mobile devices
 
 ## 🚀 Quick Start
@@ -64,28 +77,89 @@ The tool creates realistic recurring transactions including:
 
 If no accounts exist, the tool will automatically create:
 
-- **Demo Checking Account**: $5,000.00 starting balance
-- **Demo Savings Account**: $15,000.00 starting balance  
-- **Demo Credit Card**: -$850.00 starting balance
-- **Demo Investment Account**: $25,000.00 starting balance
+- **Demo Checking Account**: $5,000.00 starting balance (any currency)
+- **Demo Savings Account**: $15,000.00 starting balance (any currency)
+- **Demo Credit Card**: -$850.00 starting balance with APR (any currency)
+- **Demo Investment Account**: $25,000.00 starting balance (any currency)
+- **Demo Loan Account**: -$12,000.00 with customizable term (any currency)
+- **Demo Mortgage Account**: -$250,000.00 with P&I breakdown (any currency)
+- **Demo Cash Account**: $500.00 starting balance (any currency)
 
-All transactions will be created in the checking account.
+### 🌍 Supported Currencies (40+ currencies matching Projected Cash Flow)
+
+#### Americas
+- 🇺🇸 USD - US Dollar
+- 🇨🇦 CAD - Canadian Dollar
+- 🇲🇽 MXN - Mexican Peso
+- 🇧🇷 BRL - Brazilian Real
+- 🇦🇷 ARS - Argentine Peso
+- 🇨🇱 CLP - Chilean Peso
+- 🇨🇴 COP - Colombian Peso
+- 🇵🇪 PEN - Peruvian Sol
+
+#### Europe
+- 🇪🇺 EUR - Euro
+- 🇬🇧 GBP - British Pound
+- 🇨🇭 CHF - Swiss Franc
+- 🇸🇪 SEK - Swedish Krona
+- 🇳🇴 NOK - Norwegian Krone
+- 🇩🇰 DKK - Danish Krone
+- 🇵🇱 PLN - Polish Złoty
+- 🇨🇿 CZK - Czech Koruna
+- 🇷🇺 RUB - Russian Ruble
+- 🇺🇦 UAH - Ukrainian Hryvnia
+
+#### Asia-Pacific
+- 🇯🇵 JPY - Japanese Yen
+- 🇨🇳 CNY - Chinese Yuan
+- 🇰🇷 KRW - South Korean Won
+- 🇦🇺 AUD - Australian Dollar
+- 🇳🇿 NZD - New Zealand Dollar
+- 🇸🇬 SGD - Singapore Dollar
+- 🇭🇰 HKD - Hong Kong Dollar
+- 🇮🇳 INR - Indian Rupee
+- 🇹🇭 THB - Thai Baht
+- 🇲🇾 MYR - Malaysian Ringgit
+- 🇵🇭 PHP - Philippine Peso
+- 🇮🇩 IDR - Indonesian Rupiah
+- 🇻🇳 VND - Vietnamese Dong
+
+#### Middle East & Africa
+- 🇦🇪 AED - UAE Dirham
+- 🇸🇦 SAR - Saudi Riyal
+- 🇮🇱 ILS - Israeli Shekel
+- 🇿🇦 ZAR - South African Rand
+- 🇳🇬 NGN - Nigerian Naira
+- 🇰🇪 KES - Kenyan Shilling
+- 🇪🇬 EGP - Egyptian Pound
+- 🇹🇷 TRY - Turkish Lira
+
+All transactions will be created in the checking account with proper currency support.
 
 ## 🔧 Configuration Options
 
 - **Recurring Items**: Choose how many recurring transactions to create (1-10, default: 10)
 - **Duration**: Generate 1-24 months of data (default: 3)
-- **Account Types**: Select which types of accounts to create with customizable balances:
-  - Checking Account (default: $5,000)
-  - Savings Account (default: $15,000)
-  - Credit Card (default: -$850) - automatically adds monthly minimum payments
-  - Investment Account (default: $25,000)
-  - Loan Account (default: -$12,000) - automatically adds monthly loan payments
-  - Cash Account (default: $500)
-  - Mortgage Account (default: -$250,000) - automatically adds monthly mortgage payments
+- **Account Types**: Select which types of accounts to create with customizable balances and currencies:
+  - Checking Account (default: $5,000, any currency)
+  - Savings Account (default: $15,000, any currency)
+  - Credit Card (default: -$850, 16% APR, daily compounding) - automatically adds minimum payments
+  - Investment Account (default: $25,000, any currency)
+  - Loan Account (default: -$12,000, 10% APR, monthly compounding) - fixed monthly payments
+  - Cash Account (default: $500, any currency)
+  - Mortgage Account (default: -$250,000, 7% APR) - shows exact P&I breakdown each month
+- **Currency Selection**: Choose from 40+ world currencies for each account (all currencies supported by Projected Cash Flow)
+- **International Presets**: Quick setups for:
+  - 🇪🇺 EUR - European accounts with mortgage
+  - 🇬🇧 GBP - UK accounts with housing costs
+  - 🇯🇵 JPY - Japanese accounts (no decimals)
+  - 🇨🇦 CAD - Canadian accounts with mortgage
+  - 🇦🇺 AUD - Australian accounts
+  - 🇸🇬 SGD - Singapore accounts with investments
+  - 🌏 Mix - Multi-currency portfolio example
 - **Start Date**: Choose when to begin the transaction history
 - **Account Validation**: Automatic checking for empty accounts
-- **Real-time Preview**: See exactly what will be created before generating
+- **Real-time Preview**: See exactly what will be created before generating with proper currency formatting
 
 ## 🛡️ Security & Privacy
 
@@ -166,8 +240,27 @@ The tool uses the following LunchMoney API endpoints:
 - `GET /v1/assets` - Find checking account
 - `GET /v1/categories` - Get/create categories
 - `GET /v1/transactions` - Check existing transactions
-- `POST /v1/transactions` - Create new transactions
+- `POST /v1/transactions` - Create new transactions with currency support
 - `POST /v1/categories` - Create missing categories
+- `POST /v1/assets` - Create accounts with specific currencies
+
+### Calculation Methods
+
+- **Mortgages**: 
+  - Monthly compounding with accurate P&I split
+  - Balance decreases each month for proper interest calculation
+  - Example: $250k at 7% shows $1,458 interest month 1, $1,457 month 2, etc.
+- **Loans**: 
+  - Standard amortization formula: P = L[c(1 + c)^n]/[(1 + c)^n - 1]
+  - Fixed monthly payments with decreasing interest portion
+- **Credit Cards**: 
+  - Daily periodic rate: APR/365
+  - Effective monthly rate: (1 + daily_rate)^30 - 1
+  - Minimum payment: max(3% of balance, $25) + interest
+- **Multi-Currency**: 
+  - Proper formatting for each currency (e.g., ¥500,000 not ¥500,000.00)
+  - Currency-specific accounts for proper routing
+  - International transaction patterns for realistic data
 
 ## 🐛 Troubleshooting
 
@@ -189,6 +282,17 @@ The tool uses the following LunchMoney API endpoints:
 **CORS Issues (Local Development)**
 - Use a local server instead of opening the file directly
 - Try: `python -m http.server` or `npx serve`
+
+## 📝 Recent Updates
+
+### Version 2.0 - Multi-Currency & Enhanced Calculations
+- **40+ Currency Support**: Added full support for all currencies used by Projected Cash Flow
+- **Improved Mortgage Calculations**: Month-by-month P&I breakdown with decreasing balance
+- **Enhanced Loan Amortization**: Proper formulas matching debt snowball calculations
+- **Credit Card Accuracy**: Daily compounding for realistic minimum payments
+- **International Presets**: 7 quick setup options for different countries
+- **Currency-Specific Accounts**: Automatic routing to correct currency accounts
+- **International Patterns**: Realistic transactions for EUR, GBP, JPY, CAD, AUD, SGD, and more
 
 ## 📄 License
 

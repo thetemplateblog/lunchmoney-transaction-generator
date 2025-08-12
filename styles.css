@@ -349,6 +349,19 @@ header p {
     transition: all 0.2s ease;
 }
 
+/* Make loan and mortgage items full width */
+#account-loan:checked ~ .account-inputs,
+#account-mortgage:checked ~ .account-inputs {
+    width: 100%;
+}
+
+/* Target parent account-item when loan or mortgage */
+.account-item:has(#account-loan),
+.account-item:has(#account-mortgage) {
+    grid-column: 1 / -1;
+    width: 100%;
+}
+
 .account-item:hover {
     background: #f0f9ff;
     border-color: var(--primary-color);
@@ -371,6 +384,7 @@ header p {
     font-size: 0.875rem;
     text-align: right;
     transition: border-color 0.2s, box-shadow 0.2s;
+    color: var(--text-color);
 }
 
 .balance-input:focus {
@@ -381,6 +395,107 @@ header p {
 
 .balance-input::placeholder {
     color: var(--secondary-color);
+}
+
+.account-inputs {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.rate-input {
+    width: 80px;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 0.875rem;
+    text-align: right;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    color: var(--text-color);
+}
+
+.rate-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.rate-label {
+    font-size: 0.875rem;
+    color: var(--secondary-color);
+    white-space: nowrap;
+}
+
+.term-input {
+    width: 80px;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 0.875rem;
+    text-align: right;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    color: var(--text-color);
+}
+
+.term-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.currency-select {
+    width: 100px;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    background: white;
+    cursor: pointer;
+}
+
+.currency-select:hover {
+    border-color: var(--primary-color);
+}
+
+.foreign-examples {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.foreign-examples h4 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+
+.foreign-examples small {
+    display: block;
+    color: var(--secondary-color);
+    margin-bottom: 1rem;
+}
+
+.preset-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.preset-btn {
+    padding: 0.5rem 1rem;
+    background: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.preset-btn:hover {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    transform: translateY(-1px);
 }
 
 .progress-bar {
@@ -529,6 +644,17 @@ footer a:hover {
     text-decoration: underline;
 }
 
+/* Remove all number input spinners */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .container {
@@ -635,6 +761,28 @@ footer a:hover {
         background: #451a03;
         border-color: #d97706;
         color: #fbbf24;
+    }
+    
+    .rate-input {
+        background: #1e293b;
+        border-color: #475569;
+        color: #f1f5f9;
+    }
+    
+    .rate-input:focus {
+        border-color: #0ea5e9;
+        box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+    }
+    
+    .term-input {
+        background: #1e293b;
+        border-color: #475569;
+        color: #f1f5f9;
+    }
+    
+    .term-input:focus {
+        border-color: #0ea5e9;
+        box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
     }
 }
 

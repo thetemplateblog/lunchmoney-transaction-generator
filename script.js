@@ -97,6 +97,54 @@ class TransactionGenerator {
         this.accountId = null;
         this.categories = {};
         this.progressCallback = null;
+        this.accountBalances = {}; // Track balances for amortization
+        
+        // Currency symbols mapping - All currencies supported by projected-cashflow
+        this.currencySymbols = {
+            // Americas
+            'usd': '$',
+            'cad': 'C$',
+            'mxn': '$',
+            'brl': 'R$',
+            'ars': '$',
+            'clp': '$',
+            'cop': '$',
+            'pen': 'S/',
+            // Europe
+            'eur': '€',
+            'gbp': '£',
+            'chf': 'Fr',
+            'sek': 'kr',
+            'nok': 'kr',
+            'dkk': 'kr',
+            'pln': 'zł',
+            'czk': 'Kč',
+            'rub': '₽',
+            'uah': '₴',
+            // Asia-Pacific
+            'jpy': '¥',
+            'cny': '¥',
+            'krw': '₩',
+            'aud': 'A$',
+            'nzd': 'NZ$',
+            'sgd': 'S$',
+            'hkd': 'HK$',
+            'inr': '₹',
+            'thb': '฿',
+            'myr': 'RM',
+            'php': '₱',
+            'idr': 'Rp',
+            'vnd': '₫',
+            // Middle East & Africa
+            'aed': 'د.إ',
+            'sar': '﷼',
+            'ils': '₪',
+            'zar': 'R',
+            'ngn': '₦',
+            'kes': 'KSh',
+            'egp': '£',
+            'try': '₺'
+        };
         
         this.recurringTransactions = [
             // Income
@@ -113,6 +161,65 @@ class TransactionGenerator {
             { payee: "Safe Auto", amount: -135.50, day: 27, category: "Transportation", notes: "Car Insurance" },
             { payee: "Savings Account", amount: -200.00, day: 30, category: "Savings", notes: "Savings Transfer" }
         ];
+        
+        // International transaction patterns for all supported currencies
+        this.internationalTransactions = {
+            'eur': [
+                { payee: "European Salary Corp", amount: 4500.00, day: 1, category: "Income", notes: "EUR Salary Deposit" },
+                { payee: "Deutsche Miete GmbH", amount: -1200.00, day: 3, category: "Housing", notes: "EUR Rent Payment" },
+                { payee: "Telekom Europa", amount: -65.00, day: 10, category: "Utilities", notes: "EUR Phone/Internet" }
+            ],
+            'gbp': [
+                { payee: "UK Employer Ltd", amount: 3800.00, day: 25, category: "Income", notes: "GBP Salary" },
+                { payee: "British Landlords", amount: -1650.00, day: 1, category: "Housing", notes: "GBP Rent" },
+                { payee: "Thames Water", amount: -45.00, day: 15, category: "Utilities", notes: "GBP Water Bill" }
+            ],
+            'jpy': [
+                { payee: "Tokyo Corp", amount: 450000, day: 25, category: "Income", notes: "JPY Salary" },
+                { payee: "Apartment Tokyo", amount: -150000, day: 27, category: "Housing", notes: "JPY Rent" },
+                { payee: "JR Pass", amount: -10000, day: 1, category: "Transportation", notes: "JPY Train Pass" }
+            ],
+            'cad': [
+                { payee: "Canadian Employer", amount: 4200.00, day: 15, category: "Income", notes: "CAD Salary" },
+                { payee: "Toronto Housing", amount: -2100.00, day: 1, category: "Housing", notes: "CAD Rent" }
+            ],
+            'aud': [
+                { payee: "Australian Company", amount: 5200.00, day: 1, category: "Income", notes: "AUD Salary" },
+                { payee: "Sydney Rentals", amount: -2400.00, day: 5, category: "Housing", notes: "AUD Rent" }
+            ],
+            'sgd': [
+                { payee: "Singapore Tech", amount: 6000.00, day: 25, category: "Income", notes: "SGD Salary" },
+                { payee: "HDB Rental", amount: -2200.00, day: 1, category: "Housing", notes: "SGD Rent" }
+            ],
+            'inr': [
+                { payee: "Indian IT Services", amount: 150000, day: 1, category: "Income", notes: "INR Salary" },
+                { payee: "Mumbai Housing", amount: -45000, day: 5, category: "Housing", notes: "INR Rent" }
+            ],
+            'mxn': [
+                { payee: "Empresa Mexico", amount: 45000, day: 15, category: "Income", notes: "MXN Salary" },
+                { payee: "Renta CDMX", amount: -18000, day: 1, category: "Housing", notes: "MXN Rent" }
+            ],
+            'brl': [
+                { payee: "Empresa Brasil", amount: 8000.00, day: 5, category: "Income", notes: "BRL Salary" },
+                { payee: "Aluguel São Paulo", amount: -3200.00, day: 10, category: "Housing", notes: "BRL Rent" }
+            ],
+            'zar': [
+                { payee: "SA Company", amount: 35000, day: 25, category: "Income", notes: "ZAR Salary" },
+                { payee: "Cape Town Rental", amount: -12000, day: 1, category: "Housing", notes: "ZAR Rent" }
+            ]
+        };
+    }
+    
+    formatCurrency(amount, currency = 'usd') {
+        const symbol = this.currencySymbols[currency.toLowerCase()] || '$';
+        const absAmount = Math.abs(amount);
+        
+        // Special formatting for JPY (no decimals)
+        if (currency.toLowerCase() === 'jpy') {
+            return amount < 0 ? `-${symbol}${absAmount.toLocaleString('en-US', {maximumFractionDigits: 0})}` : `${symbol}${absAmount.toLocaleString('en-US', {maximumFractionDigits: 0})}`;
+        }
+        
+        return amount < 0 ? `-${symbol}${absAmount.toFixed(2)}` : `${symbol}${absAmount.toFixed(2)}`;
     }
 
     setProgressCallback(callback) {
@@ -156,18 +263,25 @@ class TransactionGenerator {
         }
     }
 
-    async setupAccountAndCategories(selectedAccounts = [{type: 'checking', balance: 5000}, {type: 'savings', balance: 15000}, {type: 'credit', balance: -850}, {type: 'investment', balance: 25000}]) {
+    async setupAccountAndCategories(selectedAccounts = [{type: 'checking', balance: 5000, currency: 'usd'}, {type: 'savings', balance: 15000, currency: 'usd'}, {type: 'credit', balance: -850, currency: 'usd'}, {type: 'investment', balance: 25000, currency: 'usd'}]) {
         this.updateProgress('setup', 'Getting account information...', 10);
         
         // Get existing accounts
         const assets = await this.api.getAssets();
         let checkingAccount = null;
+        this.currencyAccounts = {}; // Store account IDs by currency
         
-        // Look for existing checking account
+        // Look for existing checking account (prefer USD for backward compatibility)
         for (const asset of assets.assets || []) {
             if (asset.type_name === 'cash' && asset.name.toLowerCase().includes('checking')) {
-                checkingAccount = asset;
-                break;
+                // Store account by currency
+                const assetCurrency = (asset.currency || 'usd').toLowerCase();
+                this.currencyAccounts[assetCurrency] = asset.id;
+                
+                // Set primary checking account (prefer USD)
+                if (!checkingAccount || assetCurrency === 'usd') {
+                    checkingAccount = asset;
+                }
             }
         }
         
@@ -235,15 +349,77 @@ class TransactionGenerator {
                     name: 'Demo Mortgage Account',
                     balance: '-250000.00',
                     currency: 'usd'
+                },
+                // Foreign currency accounts
+                'checking-eur': {
+                    type_name: 'cash',
+                    subtype_name: 'checking',
+                    name: 'EUR Checking Account',
+                    balance: '5000.00',
+                    currency: 'eur'
+                },
+                'checking-gbp': {
+                    type_name: 'cash',
+                    subtype_name: 'checking',
+                    name: 'GBP Checking Account',
+                    balance: '4000.00',
+                    currency: 'gbp'
+                },
+                'checking-jpy': {
+                    type_name: 'cash',
+                    subtype_name: 'checking',
+                    name: 'JPY Checking Account',
+                    balance: '500000',
+                    currency: 'jpy'
+                },
+                'credit-eur': {
+                    type_name: 'credit',
+                    subtype_name: 'credit card',
+                    name: 'EUR Credit Card',
+                    balance: '-1200.00',
+                    currency: 'eur'
+                },
+                'mortgage-gbp': {
+                    type_name: 'loan',
+                    subtype_name: 'mortgage',
+                    name: 'UK Property Mortgage',
+                    balance: '-180000.00',
+                    currency: 'gbp'
                 }
             };
             
             const sampleAccounts = selectedAccounts
-                .filter(account => accountTemplates[account.type] && !existingAccountTypes.has(account.type))
-                .map(account => ({
-                    ...accountTemplates[account.type],
-                    balance: account.balance.toFixed(2)
-                }));
+                .filter(account => {
+                    const templateKey = account.currency && account.currency !== 'usd' 
+                        ? `${account.type}-${account.currency}` 
+                        : account.type;
+                    return (accountTemplates[templateKey] || accountTemplates[account.type]) && !existingAccountTypes.has(account.type);
+                })
+                .map(account => {
+                    const templateKey = account.currency && account.currency !== 'usd' 
+                        ? `${account.type}-${account.currency}` 
+                        : account.type;
+                    const template = accountTemplates[templateKey] || accountTemplates[account.type];
+                    
+                    // Format balance based on currency (no decimals for JPY)
+                    const balance = account.currency === 'jpy' 
+                        ? Math.round(account.balance).toString()
+                        : account.balance.toFixed(2);
+                    
+                    // Add currency to name if not USD
+                    const currency = account.currency || template.currency || 'usd';
+                    let accountName = account.customName || template.name;
+                    if (currency !== 'usd' && !accountName.includes(currency.toUpperCase())) {
+                        accountName = `${currency.toUpperCase()} ${accountName}`;
+                    }
+                    
+                    return {
+                        ...template,
+                        balance: balance,
+                        currency: currency,
+                        name: accountName
+                    };
+                });
             
             console.log('Existing account types:', Array.from(existingAccountTypes));
             console.log('Selected accounts to create (new only):', sampleAccounts);
@@ -261,12 +437,22 @@ class TransactionGenerator {
                         console.log('Account creation result:', result);
                         
                         if (result && accountData.type_name === 'cash' && accountData.subtype_name === 'checking') {
-                            checkingAccount = {
-                                id: result.asset_id || result.id,
-                                display_name: accountData.name,
-                                name: accountData.name,
-                                type_name: accountData.type_name
-                            };
+                            const assetId = result.asset_id || result.id;
+                            const assetCurrency = (accountData.currency || 'usd').toLowerCase();
+                            
+                            // Store account by currency
+                            this.currencyAccounts[assetCurrency] = assetId;
+                            
+                            // Set as primary checking if it's USD or we don't have one yet
+                            if (!checkingAccount || assetCurrency === 'usd') {
+                                checkingAccount = {
+                                    id: assetId,
+                                    display_name: accountData.name,
+                                    name: accountData.name,
+                                    type_name: accountData.type_name,
+                                    currency: assetCurrency
+                                };
+                            }
                         }
                     } catch (error) {
                         console.error(`Failed to create ${accountData.name}:`, error);
@@ -340,45 +526,113 @@ class TransactionGenerator {
         const transactions = [];
         let selectedTransactions = this.recurringTransactions.slice(0, numItems);
         
-        // Add automatic payments for credit card and loan accounts if selected
-        const additionalPayments = [];
+        // Initialize account balances for tracking
+        this.accountBalances = {};
+        for (const account of selectedAccounts) {
+            const accountKey = `${account.type}-${account.currency || 'usd'}`;
+            this.accountBalances[accountKey] = {
+                current: Math.abs(account.balance),
+                original: Math.abs(account.balance),
+                rate: account.rate || 0,
+                remainingMonths: account.remainingMonths || (account.type === 'mortgage' ? 360 : 60),
+                currency: account.currency || 'usd',
+                type: account.type
+            };
+        }
+        
+        // Process month by month for proper amortization
+        const additionalPaymentsPerMonth = [];
         
         for (const account of selectedAccounts) {
+            const accountKey = `${account.type}-${account.currency || 'usd'}`;
+            const currency = account.currency || 'usd';
+            const symbol = this.currencySymbols[currency.toLowerCase()] || '$';
+            
             if (account.type === 'credit' && account.balance < 0) {
-                // Add credit card minimum payment (3% of balance or $25, whichever is greater)
-                const minPayment = Math.max(Math.abs(account.balance) * 0.03, 25);
-                additionalPayments.push({
-                    payee: "Credit Card Payment",
-                    amount: -minPayment,
+                // Credit card with daily compounding
+                const balance = Math.abs(account.balance);
+                const annualRate = account.rate || 16;
+                const dailyRate = annualRate / 100 / 365;
+                const effectiveMonthlyRate = Math.pow(1 + dailyRate, 30) - 1;
+                const interestCharge = balance * effectiveMonthlyRate;
+                const minPayment = Math.max(balance * 0.03, 25) + interestCharge;
+                
+                additionalPaymentsPerMonth.push({
+                    payee: currency !== 'usd' ? `${currency.toUpperCase()} Credit Card Payment` : "Credit Card Payment",
+                    amount: -parseFloat(minPayment.toFixed(2)),
                     day: 5,
                     category: "Credit Card Payment",
-                    notes: "Monthly minimum payment"
+                    notes: `Min payment (${annualRate}% APR, daily compounding)`,
+                    currency: currency,
+                    accountKey: accountKey,
+                    type: 'credit'
                 });
             } else if (account.type === 'loan' && account.balance < 0) {
-                // Add loan payment (2% of balance for simplicity)
-                const loanPayment = Math.abs(account.balance) * 0.02;
-                additionalPayments.push({
-                    payee: "Loan Payment", 
-                    amount: -loanPayment,
+                // Loan with monthly compounding
+                const principal = Math.abs(account.balance);
+                const monthlyRate = (account.rate || 10) / 100 / 12;
+                const numPayments = account.remainingMonths || 60;
+                
+                let loanPayment;
+                if (monthlyRate > 0 && numPayments > 0) {
+                    loanPayment = principal * (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / 
+                                  (Math.pow(1 + monthlyRate, numPayments) - 1);
+                } else {
+                    loanPayment = principal / numPayments;
+                }
+                
+                additionalPaymentsPerMonth.push({
+                    payee: currency !== 'usd' ? `${currency.toUpperCase()} Loan Payment` : "Loan Payment",
+                    amount: -parseFloat(loanPayment.toFixed(2)),
                     day: 20,
                     category: "Loan Payment",
-                    notes: "Monthly loan payment"
+                    notes: ``, // Will be updated each month
+                    currency: currency,
+                    accountKey: accountKey,
+                    type: 'loan',
+                    fixedPayment: loanPayment,
+                    rate: account.rate || 10
                 });
             } else if (account.type === 'mortgage' && account.balance < 0) {
-                // Add mortgage payment (0.4% of balance for ~30 year mortgage)
-                const mortgagePayment = Math.abs(account.balance) * 0.004;
-                additionalPayments.push({
-                    payee: "Mortgage Payment",
-                    amount: -mortgagePayment,
+                // Mortgage with monthly compounding and proper amortization
+                const principal = Math.abs(account.balance);
+                const monthlyRate = (account.rate || 7) / 100 / 12;
+                const numPayments = account.remainingMonths || 360;
+                
+                let mortgagePayment;
+                if (monthlyRate > 0 && numPayments > 0) {
+                    mortgagePayment = principal * (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / 
+                                      (Math.pow(1 + monthlyRate, numPayments) - 1);
+                } else {
+                    mortgagePayment = principal / numPayments;
+                }
+                
+                additionalPaymentsPerMonth.push({
+                    payee: currency !== 'usd' ? `${currency.toUpperCase()} Mortgage Payment` : "Mortgage Payment",
+                    amount: -parseFloat(mortgagePayment.toFixed(2)),
                     day: 1,
                     category: "Mortgage Payment",
-                    notes: "Monthly mortgage payment"
+                    notes: ``, // Will be updated each month with actual P&I
+                    currency: currency,
+                    accountKey: accountKey,
+                    type: 'mortgage',
+                    fixedPayment: mortgagePayment,
+                    rate: account.rate || 7
                 });
             }
         }
         
-        // Combine regular transactions with additional payments
-        selectedTransactions = [...selectedTransactions, ...additionalPayments];
+        // Get international transactions if using foreign currencies
+        const usedCurrencies = new Set(selectedAccounts.map(a => a.currency || 'usd'));
+        for (const currency of usedCurrencies) {
+            if (currency !== 'usd' && this.internationalTransactions[currency]) {
+                // Add some international transactions with currency field
+                const intlTxns = this.internationalTransactions[currency]
+                    .slice(0, Math.min(3, Math.floor(numItems / 3)))
+                    .map(txn => ({ ...txn, currency: currency }));
+                selectedTransactions = [...selectedTransactions, ...intlTxns];
+            }
+        }
         
         // Start from today and go backwards
         const today = new Date();
@@ -400,7 +654,52 @@ class TransactionGenerator {
             
             console.log('Generating transactions for ' + year + '-' + (month < 10 ? '0' : '') + month);
             
-            for (const txn of selectedTransactions) {
+            // Process additional payments with proper amortization
+            const monthlyPayments = additionalPaymentsPerMonth.map(payment => {
+                const accountInfo = this.accountBalances[payment.accountKey];
+                const updatedPayment = { ...payment };
+                
+                if (payment.type === 'mortgage') {
+                    // Calculate P&I for current balance
+                    const currentBalance = accountInfo.current;
+                    const monthlyRate = payment.rate / 100 / 12;
+                    const interestPayment = currentBalance * monthlyRate;
+                    const principalPayment = payment.fixedPayment - interestPayment;
+                    const remainingMonths = accountInfo.remainingMonths - monthOffset;
+                    
+                    // Update balance for next month
+                    accountInfo.current = Math.max(0, currentBalance - principalPayment);
+                    
+                    // Format based on currency
+                    const symbol = this.currencySymbols[payment.currency.toLowerCase()] || '$';
+                    updatedPayment.notes = `P&I: ${this.formatCurrency(principalPayment, payment.currency)} principal, ${this.formatCurrency(interestPayment, payment.currency)} interest (${payment.rate}% APR, ${remainingMonths}mo left)`;
+                    
+                } else if (payment.type === 'loan') {
+                    // Calculate interest and principal for loan
+                    const currentBalance = accountInfo.current;
+                    const monthlyRate = payment.rate / 100 / 12;
+                    const interestPayment = currentBalance * monthlyRate;
+                    const principalPayment = payment.fixedPayment - interestPayment;
+                    const remainingMonths = accountInfo.remainingMonths - monthOffset;
+                    
+                    // Update balance
+                    accountInfo.current = Math.max(0, currentBalance - principalPayment);
+                    
+                    // Convert months to years for display
+                    const years = Math.floor(remainingMonths / 12);
+                    const months = remainingMonths % 12;
+                    const termDisplay = years > 0 ? `${years}yr${months > 0 ? ' ' + months + 'mo' : ''}` : `${months}mo`;
+                    
+                    updatedPayment.notes = `Monthly payment (${payment.rate}% APR, ${remainingMonths}mo/${termDisplay} left)`;
+                }
+                
+                return updatedPayment;
+            });
+            
+            // Combine regular transactions with calculated payments
+            const allTransactions = [...selectedTransactions, ...monthlyPayments];
+            
+            for (const txn of allTransactions) {
                 const date = this.getTransactionDate(year, month, txn.day);
                 const categoryId = this.categories[txn.category];
                 
@@ -409,9 +708,18 @@ class TransactionGenerator {
                     continue;
                 }
                 
-                if (!this.accountId) {
-                    console.error('Missing account ID');
-                    continue;
+                // Determine which account to use based on currency
+                const txnCurrency = (txn.currency || 'usd').toLowerCase();
+                let assetId = this.currencyAccounts[txnCurrency] || this.accountId;
+                
+                if (!assetId) {
+                    console.error('No account found for currency: ' + txnCurrency);
+                    // Fallback to main account if available
+                    assetId = this.accountId;
+                    if (!assetId) {
+                        console.error('Missing account ID');
+                        continue;
+                    }
                 }
                 
                 const transaction = {
@@ -419,13 +727,16 @@ class TransactionGenerator {
                     amount: txn.amount,
                     payee: txn.payee,
                     category_id: categoryId,
-                    asset_id: this.accountId,
+                    asset_id: assetId,
                     notes: txn.notes,
                     status: 'cleared'
                 };
                 
+                // Always specify currency to be explicit
+                transaction.currency = txnCurrency;
+                
                 transactions.push(transaction);
-                console.log('Generated transaction: ' + txn.payee + ' - ' + txn.amount + ' on ' + date);
+                console.log('Generated transaction: ' + txn.payee + ' - ' + this.formatCurrency(txn.amount, txn.currency || 'usd') + ' on ' + date);
             }
         }
         
@@ -528,6 +839,151 @@ class UIController {
         this.generator.setProgressCallback(this.updateProgress.bind(this));
         this.setupEventListeners();
     }
+    
+    applyPreset(preset) {
+        // Clear all checkboxes first
+        document.querySelectorAll('.account-types input[type="checkbox"]').forEach(cb => cb.checked = false);
+        
+        switch(preset) {
+            case 'europe':
+                // EUR checking and savings, EUR credit card, EUR mortgage
+                document.getElementById('account-checking').checked = true;
+                document.getElementById('balance-checking').value = 5000;
+                document.getElementById('currency-checking').value = 'eur';
+                
+                document.getElementById('account-savings').checked = true;
+                document.getElementById('balance-savings').value = 20000;
+                document.getElementById('currency-savings').value = 'eur';
+                
+                document.getElementById('account-credit').checked = true;
+                document.getElementById('balance-credit').value = -1200;
+                document.getElementById('rate-credit').value = 12;
+                document.getElementById('currency-credit').value = 'eur';
+                
+                document.getElementById('account-mortgage').checked = true;
+                document.getElementById('balance-mortgage').value = -180000;
+                document.getElementById('rate-mortgage').value = 4.5;
+                document.getElementById('remaining-mortgage').value = 300;
+                document.getElementById('currency-mortgage').value = 'eur';
+                break;
+                
+            case 'uk':
+                // GBP accounts
+                document.getElementById('account-checking').checked = true;
+                document.getElementById('balance-checking').value = 4000;
+                document.getElementById('currency-checking').value = 'gbp';
+                
+                document.getElementById('account-savings').checked = true;
+                document.getElementById('balance-savings').value = 15000;
+                document.getElementById('currency-savings').value = 'gbp';
+                
+                document.getElementById('account-credit').checked = true;
+                document.getElementById('balance-credit').value = -950;
+                document.getElementById('rate-credit').value = 22;
+                document.getElementById('currency-credit').value = 'gbp';
+                
+                document.getElementById('account-mortgage').checked = true;
+                document.getElementById('balance-mortgage').value = -220000;
+                document.getElementById('rate-mortgage').value = 5.5;
+                document.getElementById('remaining-mortgage').value = 348;
+                document.getElementById('currency-mortgage').value = 'gbp';
+                break;
+                
+            case 'japan':
+                // JPY accounts
+                document.getElementById('account-checking').checked = true;
+                document.getElementById('balance-checking').value = 500000;
+                document.getElementById('currency-checking').value = 'jpy';
+                
+                document.getElementById('account-savings').checked = true;
+                document.getElementById('balance-savings').value = 2000000;
+                document.getElementById('currency-savings').value = 'jpy';
+                
+                document.getElementById('account-credit').checked = true;
+                document.getElementById('balance-credit').value = -100000;
+                document.getElementById('rate-credit').value = 15;
+                document.getElementById('currency-credit').value = 'jpy';
+                break;
+                
+            case 'canada':
+                // CAD accounts
+                document.getElementById('account-checking').checked = true;
+                document.getElementById('balance-checking').value = 6000;
+                document.getElementById('currency-checking').value = 'cad';
+                
+                document.getElementById('account-savings').checked = true;
+                document.getElementById('balance-savings').value = 18000;
+                document.getElementById('currency-savings').value = 'cad';
+                
+                document.getElementById('account-mortgage').checked = true;
+                document.getElementById('balance-mortgage').value = -350000;
+                document.getElementById('rate-mortgage').value = 6.5;
+                document.getElementById('remaining-mortgage').value = 300;
+                document.getElementById('currency-mortgage').value = 'cad';
+                break;
+                
+            case 'australia':
+                // AUD accounts
+                document.getElementById('account-checking').checked = true;
+                document.getElementById('balance-checking').value = 7000;
+                document.getElementById('currency-checking').value = 'aud';
+                
+                document.getElementById('account-savings').checked = true;
+                document.getElementById('balance-savings').value = 25000;
+                document.getElementById('currency-savings').value = 'aud';
+                
+                document.getElementById('account-credit').checked = true;
+                document.getElementById('balance-credit').value = -1800;
+                document.getElementById('rate-credit').value = 20;
+                document.getElementById('currency-credit').value = 'aud';
+                break;
+                
+            case 'singapore':
+                // SGD accounts
+                document.getElementById('account-checking').checked = true;
+                document.getElementById('balance-checking').value = 8000;
+                document.getElementById('currency-checking').value = 'sgd';
+                
+                document.getElementById('account-investment').checked = true;
+                document.getElementById('balance-investment').value = 50000;
+                document.getElementById('currency-investment').value = 'sgd';
+                
+                document.getElementById('account-loan').checked = true;
+                document.getElementById('balance-loan').value = -20000;
+                document.getElementById('rate-loan').value = 5.5;
+                document.getElementById('remaining-loan').value = 48;
+                document.getElementById('currency-loan').value = 'sgd';
+                break;
+                
+            case 'multi':
+                // Mix of currencies
+                document.getElementById('account-checking').checked = true;
+                document.getElementById('balance-checking').value = 5000;
+                document.getElementById('currency-checking').value = 'usd';
+                
+                document.getElementById('account-savings').checked = true;
+                document.getElementById('balance-savings').value = 10000;
+                document.getElementById('currency-savings').value = 'eur';
+                
+                document.getElementById('account-investment').checked = true;
+                document.getElementById('balance-investment').value = 30000;
+                document.getElementById('currency-investment').value = 'gbp';
+                
+                document.getElementById('account-credit').checked = true;
+                document.getElementById('balance-credit').value = -100000;
+                document.getElementById('rate-credit').value = 15;
+                document.getElementById('currency-credit').value = 'jpy';
+                
+                document.getElementById('account-mortgage').checked = true;
+                document.getElementById('balance-mortgage').value = -450000;
+                document.getElementById('rate-mortgage').value = 5.8;
+                document.getElementById('remaining-mortgage').value = 300;
+                document.getElementById('currency-mortgage').value = 'cad';
+                break;
+        }
+        
+        this.updatePreview();
+    }
 
     setupEventListeners() {
         console.log('Setting up event listeners...');
@@ -575,6 +1031,24 @@ class UIController {
         const balanceInputs = document.querySelectorAll('.balance-input');
         balanceInputs.forEach(input => {
             input.addEventListener('input', this.updatePreview.bind(this));
+        });
+        
+        // Add event listeners for rate inputs
+        const rateInputs = document.querySelectorAll('.rate-input');
+        rateInputs.forEach(input => {
+            input.addEventListener('input', this.updatePreview.bind(this));
+        });
+        
+        // Add event listeners for term inputs (mortgage remaining months)
+        const termInputs = document.querySelectorAll('.term-input');
+        termInputs.forEach(input => {
+            input.addEventListener('input', this.updatePreview.bind(this));
+        });
+        
+        // Add event listeners for currency selectors
+        const currencySelects = document.querySelectorAll('.currency-select');
+        currencySelects.forEach(select => {
+            select.addEventListener('change', this.updatePreview.bind(this));
         });
         
         console.log('Event listeners setup complete');
@@ -726,7 +1200,36 @@ class UIController {
             const accountName = cb.parentElement.querySelector('span').textContent;
             const balanceInput = document.getElementById(`balance-${accountType}`);
             const balance = parseFloat(balanceInput.value) || 0;
-            return { name: accountName, balance: balance };
+            
+            // Get currency
+            const currencySelect = document.getElementById(`currency-${accountType}`);
+            const currency = currencySelect ? currencySelect.value : 'usd';
+            
+            // Get interest rate if applicable
+            const rateInput = document.getElementById(`rate-${accountType}`);
+            const rate = rateInput ? parseFloat(rateInput.value) || 0 : 0;
+            
+            // Get remaining months for loan or mortgage
+            let remainingMonths = undefined;
+            if (accountType === 'loan' || accountType === 'mortgage') {
+                const remainingInput = document.getElementById(`remaining-${accountType}`);
+                if (remainingInput) {
+                    remainingMonths = parseInt(remainingInput.value);
+                    // Use defaults if the input is empty or invalid
+                    if (!remainingMonths || remainingMonths <= 0) {
+                        remainingMonths = accountType === 'loan' ? 60 : 360;
+                    }
+                }
+            }
+            
+            return { 
+                name: accountName, 
+                balance: balance, 
+                type: accountType, 
+                rate: rate,
+                remainingMonths: remainingMonths,
+                currency: currency
+            };
         });
         
         if (selectedAccounts.length > 0) {
@@ -736,13 +1239,12 @@ class UIController {
             `;
             let hasLoanOrCredit = false;
             for (const account of selectedAccounts) {
-                const formattedBalance = account.balance < 0 
-                    ? `-$${Math.abs(account.balance).toFixed(2)}`
-                    : `$${account.balance.toFixed(2)}`;
-                previewHtml += `<li>${account.name}: ${formattedBalance}</li>`;
+                const formattedBalance = this.generator.formatCurrency(account.balance, account.currency);
+                const currencyCode = account.currency.toUpperCase();
+                previewHtml += `<li>${account.name} (${currencyCode}): ${formattedBalance}</li>`;
                 
                 // Check if we need to add automatic payments
-                if ((account.name.includes('Credit Card') || account.name.includes('Loan') || account.name.includes('Mortgage')) && account.balance < 0) {
+                if ((account.type === 'credit' || account.type === 'loan' || account.type === 'mortgage') && account.balance < 0) {
                     hasLoanOrCredit = true;
                 }
             }
@@ -756,17 +1258,64 @@ class UIController {
                 `;
                 
                 for (const account of selectedAccounts) {
-                    if (account.name.includes('Credit Card') && account.balance < 0) {
-                        const minPayment = Math.max(Math.abs(account.balance) * 0.03, 25);
-                        previewHtml += `• Credit Card Payment: $${minPayment.toFixed(2)}/month on the 5th<br>`;
+                    if (account.type === 'credit' && account.balance < 0) {
+                        const balance = Math.abs(account.balance);
+                        const annualRate = account.rate || 16;
+                        const dailyRate = annualRate / 100 / 365;
+                        const effectiveMonthlyRate = Math.pow(1 + dailyRate, 30) - 1;
+                        const interestCharge = balance * effectiveMonthlyRate;
+                        const minPayment = Math.max(balance * 0.03, 25) + interestCharge;
+                        const formattedPayment = this.generator.formatCurrency(minPayment, account.currency);
+                        previewHtml += `• Credit Card Payment: ${formattedPayment}/month on the 5th (${annualRate}% APR, daily compounding)<br>`;
                     }
-                    if (account.name.includes('Loan') && account.balance < 0) {
-                        const loanPayment = Math.abs(account.balance) * 0.02;
-                        previewHtml += `• Loan Payment: $${loanPayment.toFixed(2)}/month on the 20th<br>`;
+                    if (account.type === 'loan' && account.balance < 0) {
+                        const principal = Math.abs(account.balance);
+                        const monthlyRate = (account.rate || 10) / 100 / 12;
+                        const numPayments = account.remainingMonths || 60; // Use actual remaining months
+                        
+                        let loanPayment;
+                        if (monthlyRate > 0 && numPayments > 0) {
+                            loanPayment = principal * (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / 
+                                          (Math.pow(1 + monthlyRate, numPayments) - 1);
+                        } else {
+                            loanPayment = principal / numPayments;
+                        }
+                        
+                        // Convert months to years for display
+                        const years = Math.floor(numPayments / 12);
+                        const months = numPayments % 12;
+                        const termDisplay = years > 0 ? `${years}yr${months > 0 ? ' ' + months + 'mo' : ''}` : `${months}mo`;
+                        
+                        const formattedPayment = this.generator.formatCurrency(loanPayment, account.currency);
+                        previewHtml += `• Loan Payment: ${formattedPayment}/month on the 20th (${account.rate}% APR, ${numPayments}mo/${termDisplay})<br>`;
                     }
-                    if (account.name.includes('Mortgage') && account.balance < 0) {
-                        const mortgagePayment = Math.abs(account.balance) * 0.004;
-                        previewHtml += `• Mortgage Payment: $${mortgagePayment.toFixed(2)}/month on the 1st<br>`;
+                    if (account.type === 'mortgage' && account.balance < 0) {
+                        const principal = Math.abs(account.balance);
+                        const monthlyRate = (account.rate || 7) / 100 / 12;
+                        const numPayments = account.remainingMonths || 360; // Use actual remaining months
+                        
+                        let mortgagePayment;
+                        if (monthlyRate > 0 && numPayments > 0) {
+                            mortgagePayment = principal * (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / 
+                                              (Math.pow(1 + monthlyRate, numPayments) - 1);
+                        } else {
+                            mortgagePayment = principal / numPayments;
+                        }
+                        
+                        // Calculate first month's interest and principal
+                        const interestPayment = principal * monthlyRate;
+                        const principalPayment = mortgagePayment - interestPayment;
+                        
+                        // Convert months to years for display
+                        const years = Math.floor(numPayments / 12);
+                        const months = numPayments % 12;
+                        const termDisplay = years > 0 ? `${years}yr${months > 0 ? ' ' + months + 'mo' : ''}` : `${months}mo`;
+                        
+                        const formattedPayment = this.generator.formatCurrency(mortgagePayment, account.currency);
+                        const formattedPrincipal = this.generator.formatCurrency(principalPayment, account.currency);
+                        const formattedInterest = this.generator.formatCurrency(interestPayment, account.currency);
+                        previewHtml += `• Mortgage Payment: ${formattedPayment}/month on the 1st<br>`;
+                        previewHtml += `&nbsp;&nbsp;&nbsp;→ Principal: ${formattedPrincipal}, Interest: ${formattedInterest} (${account.rate}% APR, ${numPayments}mo/${termDisplay} left)<br>`;
                     }
                 }
                 
@@ -819,7 +1368,35 @@ class UIController {
             const accountType = cb.value;
             const balanceInput = document.getElementById(`balance-${accountType}`);
             const balance = parseFloat(balanceInput.value) || 0;
-            return { type: accountType, balance: balance };
+            
+            // Get currency
+            const currencySelect = document.getElementById(`currency-${accountType}`);
+            const currency = currencySelect ? currencySelect.value : 'usd';
+            
+            // Get interest rate if applicable
+            const rateInput = document.getElementById(`rate-${accountType}`);
+            const rate = rateInput ? parseFloat(rateInput.value) || 0 : 0;
+            
+            // Get remaining months for loan or mortgage
+            let remainingMonths = undefined;
+            if (accountType === 'loan' || accountType === 'mortgage') {
+                const remainingInput = document.getElementById(`remaining-${accountType}`);
+                if (remainingInput) {
+                    remainingMonths = parseInt(remainingInput.value);
+                    // Use defaults if the input is empty or invalid
+                    if (!remainingMonths || remainingMonths <= 0) {
+                        remainingMonths = accountType === 'loan' ? 60 : 360;
+                    }
+                }
+            }
+            
+            return { 
+                type: accountType, 
+                balance: balance, 
+                rate: rate,
+                remainingMonths: remainingMonths,
+                currency: currency
+            };
         });
         
         document.getElementById('generateBtn').disabled = true;
@@ -881,10 +1458,12 @@ class UIController {
 }
 
 // Initialize the application
+let uiController;
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, initializing UI controller...');
     try {
-        new UIController();
+        uiController = new UIController();
+        window.uiController = uiController; // Make it globally accessible
         console.log('UI controller initialized successfully');
     } catch (error) {
         console.error('Failed to initialize UI controller:', error);

@@ -78,56 +78,213 @@
                 
                 <div class="form-group">
                     <label>Account Types to Create:</label>
-                    <small>Select which types of accounts to create and set their starting balances</small>
+                    <small>Select which types of accounts to create and set their starting balances and currencies</small>
                     <div class="account-types">
                         <div class="account-item">
                             <label class="checkbox-container">
                                 <input type="checkbox" id="account-checking" value="checking" checked>
                                 <span>Checking Account</span>
                             </label>
-                            <input type="number" class="balance-input" id="balance-checking" value="5000" step="0.01" placeholder="Balance">
+                            <div class="account-inputs">
+                                <input type="number" class="balance-input" id="balance-checking" value="5000" step="0.01" placeholder="Balance">
+                                <select class="currency-select" id="currency-checking">
+                                    <optgroup label="Americas">
+                                        <option value="usd">USD ($)</option>
+                                        <option value="cad">CAD (C$)</option>
+                                        <option value="mxn">MXN ($)</option>
+                                        <option value="brl">BRL (R$)</option>
+                                    </optgroup>
+                                    <optgroup label="Europe">
+                                        <option value="eur">EUR (€)</option>
+                                        <option value="gbp">GBP (£)</option>
+                                        <option value="chf">CHF (Fr)</option>
+                                        <option value="sek">SEK (kr)</option>
+                                        <option value="nok">NOK (kr)</option>
+                                        <option value="dkk">DKK (kr)</option>
+                                        <option value="pln">PLN (zł)</option>
+                                        <option value="czk">CZK (Kč)</option>
+                                    </optgroup>
+                                    <optgroup label="Asia-Pacific">
+                                        <option value="jpy">JPY (¥)</option>
+                                        <option value="cny">CNY (¥)</option>
+                                        <option value="krw">KRW (₩)</option>
+                                        <option value="aud">AUD (A$)</option>
+                                        <option value="nzd">NZD (NZ$)</option>
+                                        <option value="sgd">SGD (S$)</option>
+                                        <option value="hkd">HKD (HK$)</option>
+                                        <option value="inr">INR (₹)</option>
+                                        <option value="thb">THB (฿)</option>
+                                    </optgroup>
+                                    <optgroup label="Middle East & Africa">
+                                        <option value="aed">AED (د.إ)</option>
+                                        <option value="ils">ILS (₪)</option>
+                                        <option value="zar">ZAR (R)</option>
+                                        <option value="try">TRY (₺)</option>
+                                    </optgroup>
+                                </select>
+                            </div>
                         </div>
                         <div class="account-item">
                             <label class="checkbox-container">
                                 <input type="checkbox" id="account-savings" value="savings" checked>
                                 <span>Savings Account</span>
                             </label>
-                            <input type="number" class="balance-input" id="balance-savings" value="15000" step="0.01" placeholder="Balance">
+                            <div class="account-inputs">
+                                <input type="number" class="balance-input" id="balance-savings" value="15000" step="0.01" placeholder="Balance">
+                                <select class="currency-select" id="currency-savings">
+                                    <optgroup label="Popular">
+                                        <option value="usd">USD ($)</option>
+                                        <option value="eur">EUR (€)</option>
+                                        <option value="gbp">GBP (£)</option>
+                                        <option value="jpy">JPY (¥)</option>
+                                        <option value="cad">CAD (C$)</option>
+                                        <option value="aud">AUD (A$)</option>
+                                    </optgroup>
+                                    <optgroup label="More Currencies">
+                                        <option value="chf">CHF (Fr)</option>
+                                        <option value="sek">SEK (kr)</option>
+                                        <option value="nok">NOK (kr)</option>
+                                        <option value="dkk">DKK (kr)</option>
+                                        <option value="nzd">NZD (NZ$)</option>
+                                        <option value="sgd">SGD (S$)</option>
+                                        <option value="hkd">HKD (HK$)</option>
+                                        <option value="mxn">MXN ($)</option>
+                                        <option value="brl">BRL (R$)</option>
+                                        <option value="inr">INR (₹)</option>
+                                        <option value="krw">KRW (₩)</option>
+                                        <option value="zar">ZAR (R)</option>
+                                    </optgroup>
+                                </select>
+                            </div>
                         </div>
                         <div class="account-item">
                             <label class="checkbox-container">
                                 <input type="checkbox" id="account-credit" value="credit" checked>
                                 <span>Credit Card</span>
                             </label>
-                            <input type="number" class="balance-input" id="balance-credit" value="-850" step="0.01" placeholder="Balance">
+                            <div class="account-inputs">
+                                <input type="number" class="balance-input" id="balance-credit" value="-850" step="0.01" placeholder="Balance">
+                                <input type="number" class="rate-input" id="rate-credit" value="16" step="0.01" min="0" max="100" placeholder="APR %">
+                                <span class="rate-label">% APR</span>
+                                <select class="currency-select" id="currency-credit">
+                                    <option value="usd">USD ($)</option>
+                                    <option value="eur">EUR (€)</option>
+                                    <option value="gbp">GBP (£)</option>
+                                    <option value="cad">CAD (C$)</option>
+                                    <option value="aud">AUD (A$)</option>
+                                    <option value="jpy">JPY (¥)</option>
+                                    <option value="sgd">SGD (S$)</option>
+                                    <option value="hkd">HKD (HK$)</option>
+                                    <option value="mxn">MXN ($)</option>
+                                    <option value="brl">BRL (R$)</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="account-item">
                             <label class="checkbox-container">
                                 <input type="checkbox" id="account-investment" value="investment" checked>
                                 <span>Investment Account</span>
                             </label>
-                            <input type="number" class="balance-input" id="balance-investment" value="25000" step="0.01" placeholder="Balance">
+                            <div class="account-inputs">
+                                <input type="number" class="balance-input" id="balance-investment" value="25000" step="0.01" placeholder="Balance">
+                                <select class="currency-select" id="currency-investment">
+                                    <option value="usd">USD ($)</option>
+                                    <option value="eur">EUR (€)</option>
+                                    <option value="gbp">GBP (£)</option>
+                                    <option value="cad">CAD (C$)</option>
+                                    <option value="aud">AUD (A$)</option>
+                                    <option value="jpy">JPY (¥)</option>
+                                    <option value="chf">CHF (Fr)</option>
+                                    <option value="sgd">SGD (S$)</option>
+                                    <option value="hkd">HKD (HK$)</option>
+                                    <option value="cny">CNY (¥)</option>
+                                    <option value="inr">INR (₹)</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="account-item">
                             <label class="checkbox-container">
                                 <input type="checkbox" id="account-loan" value="loan">
                                 <span>Loan Account</span>
                             </label>
-                            <input type="number" class="balance-input" id="balance-loan" value="-12000" step="0.01" placeholder="Balance">
+                            <div class="account-inputs">
+                                <input type="number" class="balance-input" id="balance-loan" value="-12000" step="0.01" placeholder="Balance">
+                                <input type="number" class="rate-input" id="rate-loan" value="10" step="0.01" min="0" max="100" placeholder="APR %">
+                                <span class="rate-label">% APR</span>
+                                <input type="number" class="term-input" id="remaining-loan" value="60" min="1" max="360" placeholder="Months left">
+                                <span class="rate-label">mo left</span>
+                                <select class="currency-select" id="currency-loan">
+                                    <option value="usd">USD ($)</option>
+                                    <option value="eur">EUR (€)</option>
+                                    <option value="gbp">GBP (£)</option>
+                                    <option value="cad">CAD (C$)</option>
+                                    <option value="aud">AUD (A$)</option>
+                                    <option value="nzd">NZD (NZ$)</option>
+                                    <option value="sgd">SGD (S$)</option>
+                                    <option value="zar">ZAR (R)</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="account-item">
                             <label class="checkbox-container">
                                 <input type="checkbox" id="account-cash" value="cash">
                                 <span>Cash Account</span>
                             </label>
-                            <input type="number" class="balance-input" id="balance-cash" value="500" step="0.01" placeholder="Balance">
+                            <div class="account-inputs">
+                                <input type="number" class="balance-input" id="balance-cash" value="500" step="0.01" placeholder="Balance">
+                                <select class="currency-select" id="currency-cash">
+                                    <option value="usd">USD ($)</option>
+                                    <option value="eur">EUR (€)</option>
+                                    <option value="gbp">GBP (£)</option>
+                                    <option value="cad">CAD (C$)</option>
+                                    <option value="aud">AUD (A$)</option>
+                                    <option value="jpy">JPY (¥)</option>
+                                    <option value="mxn">MXN ($)</option>
+                                    <option value="brl">BRL (R$)</option>
+                                    <option value="inr">INR (₹)</option>
+                                    <option value="thb">THB (฿)</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="account-item">
                             <label class="checkbox-container">
                                 <input type="checkbox" id="account-mortgage" value="mortgage">
                                 <span>Mortgage Account</span>
                             </label>
-                            <input type="number" class="balance-input" id="balance-mortgage" value="-250000" step="0.01" placeholder="Balance">
+                            <div class="account-inputs">
+                                <input type="number" class="balance-input" id="balance-mortgage" value="-250000" step="0.01" placeholder="Balance">
+                                <input type="number" class="rate-input" id="rate-mortgage" value="7" step="0.01" min="0" max="100" placeholder="APR %">
+                                <span class="rate-label">% APR</span>
+                                <input type="number" class="term-input" id="remaining-mortgage" value="360" min="1" max="360" placeholder="Months left">
+                                <span class="rate-label">mo left</span>
+                                <select class="currency-select" id="currency-mortgage">
+                                    <option value="usd">USD ($)</option>
+                                    <option value="eur">EUR (€)</option>
+                                    <option value="gbp">GBP (£)</option>
+                                    <option value="cad">CAD (C$)</option>
+                                    <option value="aud">AUD (A$)</option>
+                                    <option value="nzd">NZD (NZ$)</option>
+                                    <option value="chf">CHF (Fr)</option>
+                                    <option value="sek">SEK (kr)</option>
+                                    <option value="nok">NOK (kr)</option>
+                                    <option value="dkk">DKK (kr)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Foreign Currency Examples -->
+                    <div class="foreign-examples">
+                        <h4>\ud83c\udf0d Foreign Currency Examples</h4>
+                        <small>Quick presets for international accounts</small>
+                        <div class="preset-buttons">
+                            <button class="preset-btn" onclick="uiController.applyPreset('europe')">🇪🇺 EUR</button>
+                            <button class="preset-btn" onclick="uiController.applyPreset('uk')">🇬🇧 GBP</button>
+                            <button class="preset-btn" onclick="uiController.applyPreset('japan')">🇯🇵 JPY</button>
+                            <button class="preset-btn" onclick="uiController.applyPreset('canada')">🇨🇦 CAD</button>
+                            <button class="preset-btn" onclick="uiController.applyPreset('australia')">🇦🇺 AUD</button>
+                            <button class="preset-btn" onclick="uiController.applyPreset('singapore')">🇸🇬 SGD</button>
+                            <button class="preset-btn" onclick="uiController.applyPreset('multi')">🌏 Mix</button>
                         </div>
                     </div>
                 </div>
