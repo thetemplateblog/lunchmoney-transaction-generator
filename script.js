@@ -1435,9 +1435,9 @@ class UIController {
                 <div class="next-steps">
                     <h4>Next Steps:</h4>
                     <ul>
-                        <li>Check your LunchMoney account to see the new transactions</li>
-                        <li><strong>Go to Recurring in LunchMoney and approve the suggested items</strong></li>
-                        <li>LunchMoney will automatically detect recurring patterns</li>
+                        <li>Check your Lunch Money account to see the new transactions</li>
+                        <li><strong>Go to Recurring in Lunch Money and approve the suggested items</strong></li>
+                        <li>Lunch Money will automatically detect recurring patterns</li>
                         <li>You can now test budgeting and reporting features</li>
                     </ul>
                 </div>

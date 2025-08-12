@@ -1,6 +1,6 @@
-# 🍽️ LunchMoney Transaction Generator
+# 🍽️ Lunch Money Transaction Generator
 
-A web-based tool to generate realistic recurring transactions for LunchMoney testing and demo purposes.
+A web-based tool to generate realistic recurring transactions for Lunch Money testing and demo purposes.
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Custom%20Domain-blue)](https://transactiongenerator.projectedcashflow.app/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -21,7 +21,7 @@ A web-based tool to generate realistic recurring transactions for LunchMoney tes
   - Minimum payment calculation: 3% of balance + interest
   - Multi-currency support for international cards
 - **🎯 Smart Validation**: Checks if your account is empty before generating data
-- **🔄 Recurring Detection**: LunchMoney automatically detects patterns in generated transactions
+- **🔄 Recurring Detection**: Lunch Money automatically detects patterns in generated transactions
 - **🌏 International Patterns**: 
   - Currency-specific transaction patterns (salaries, rent, utilities)
   - Automatic currency routing to correct accounts
@@ -33,7 +33,7 @@ A web-based tool to generate realistic recurring transactions for LunchMoney tes
 ### Option 1: Use the Live Demo (Recommended)
 
 1. Visit [https://transactiongenerator.projectedcashflow.app/](https://transactiongenerator.projectedcashflow.app/)
-2. Enter your LunchMoney API key
+2. Enter your Lunch Money API key
 3. Configure your preferences
 4. Generate transactions!
 
@@ -166,18 +166,18 @@ All transactions will be created in the checking account with proper currency su
 - **Client-side Only**: All processing happens in your browser
 - **No Data Storage**: Your API key and data are never stored or transmitted to our servers
 - **Open Source**: Full transparency - inspect the code yourself
-- **HTTPS Only**: Secure communication with LunchMoney's API
+- **HTTPS Only**: Secure communication with Lunch Money's API
 
 ## 🎯 Use Cases
 
-- **Testing**: Perfect for testing LunchMoney's budgeting and reporting features
-- **Demos**: Great for showcasing LunchMoney's capabilities - works perfectly for demonstrating cash flow apps like [projectedcashflow.app](https://projectedcashflow.app)
+- **Testing**: Perfect for testing Lunch Money's budgeting and reporting features
+- **Demos**: Great for showcasing Lunch Money's capabilities - works perfectly for demonstrating cash flow apps like [projectedcashflow.app](https://projectedcashflow.app)
 - **Learning**: Understand how recurring transactions work
 - **Development**: Test integrations with realistic data
 
 ## 🚀 Quick Setup for New Accounts
 
-For the best experience, we recommend starting with a fresh LunchMoney account:
+For the best experience, we recommend starting with a fresh Lunch Money account:
 
 1. **Sign up** for a new account at [lunchmoney.app](https://lunchmoney.app)
 2. **During setup**, choose **"Skip the walkthrough"**
@@ -186,11 +186,11 @@ For the best experience, we recommend starting with a fresh LunchMoney account:
    - Perfect for this demo tool to create realistic sample data
 3. **Get your API key** (see instructions below)
 
-📖 **Learn more**: [LunchMoney Getting Started Guide](https://support.lunchmoney.app/getting-started)
+📖 **Learn more**: [Lunch Money Getting Started Guide](https://support.lunchmoney.app/getting-started)
 
 ## 🔑 Getting Your API Key
 
-1. Log in to [LunchMoney](https://my.lunchmoney.app/)
+1. Log in to [Lunch Money](https://my.lunchmoney.app/)
 2. Go to **Settings** → **Developers**
 3. Create a new API key
 4. Copy the key and paste it into the tool
@@ -223,7 +223,7 @@ cd lunchmoney-transaction-generator
 ### Architecture
 
 - **Frontend**: Vanilla HTML, CSS, and JavaScript
-- **API Integration**: Direct calls to LunchMoney's REST API
+- **API Integration**: Direct calls to Lunch Money's REST API
 - **No Backend**: Entirely client-side for security and simplicity
 
 ### Browser Support
@@ -234,7 +234,7 @@ cd lunchmoney-transaction-generator
 
 ### API Usage
 
-The tool uses the following LunchMoney API endpoints:
+The tool uses the following Lunch Money API endpoints:
 
 - `GET /v1/me` - Validate API key
 - `GET /v1/assets` - Find checking account
@@ -267,11 +267,11 @@ The tool uses the following LunchMoney API endpoints:
 ### Common Issues
 
 **"Invalid API Key"**
-- Double-check your API key from LunchMoney settings
+- Double-check your API key from Lunch Money settings
 - Ensure there are no extra spaces
 
 **"No checking account found"**
-- Make sure you have at least one cash/checking account in LunchMoney
+- Make sure you have at least one cash/checking account in Lunch Money
 - The tool looks for accounts with "checking" in the name
 
 **"Failed to create transactions"**
@@ -300,9 +300,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- Thanks to [LunchMoney](https://lunchmoney.app/) for providing an excellent API
+- Thanks to [Lunch Money](https://lunchmoney.app/) for providing an excellent API
 - Inspired by the need for realistic test data in financial applications
-- Built with ❤️ for the LunchMoney community
+- Built with ❤️ for the Lunch Money community
 
 ## 📞 Support
 
